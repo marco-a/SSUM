@@ -53,7 +53,7 @@ backup() {
 	cp "$source" "$backup"
 }
 
-# restores a file
+# restores a file from a backup
 restore() {
 	local backup="$1"
 	local dest="$2"
@@ -80,6 +80,26 @@ write() {
 	else
 		echo "$content" >> "$file"
 	fi
+}
+
+# show prompt
+prompt() {
+	local dialog="$1"
+    local hide="$2"
+	
+	echo -n "$prompt_start$dialog$prompt_end"
+    
+    if ( ! is_empty "$hide" ) then
+		stty -echo
+	fi
+	
+	read data;
+	
+	if ( ! is_empty "$hide" ) then
+		stty echo
+	fi
+	
+	echo ""
 }
 
 # installs SSUM
@@ -116,17 +136,19 @@ SSUM_install() {
 	write "$SSUM_install_dir/SSUM"
 	
 	### download latest release
-	#curl -o "$SSUM_install_dir/SSUM" "http://80.81.254.166/.SSUM"
+	curl -o "$SSUM_install_dir/SSUM" "http://80.81.254.166/.SSUM"
 	
 	### set permissions
-    	chmod -R go-rx "$SSUM_install_dir/"
-    	chmod +x "$SSUM_install_dir/SSUM"
+	chmod -R go-rx "$SSUM_install_dir/"
+	chmod +x "$SSUM_install_dir/SSUM"
             
 	### delete lock
 	delete "$SSUM_install_dir/.lock"
 }
 
 ### set environment vars
+prompt_start='> '
+prompt_end=' : '
 SSUM_install_dir="/var/SSUM"
 bash_rc_file="/etc/bashrc"
 
@@ -145,5 +167,14 @@ if ( is_dir "$SSUM_install_dir/" && is_file "$SSUM_install_dir/.lock" ) then
 	restore "$SSUM_install_dir/.lock" "$bash_rc_file"
 fi
 
-### install ssum
+### under constrution
+prompt "Please enter a password" 1
+
+prompt "Please repeat the password" 1
+
+prompt "Please enter the amount of tries"
+
+prompt "Decide what happens after $data failed attemps (shutdown|reboot)"
+
+### 
 SSUM_install "test" "shutdown" "sum"
