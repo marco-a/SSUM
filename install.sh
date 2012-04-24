@@ -41,7 +41,7 @@ delete() {
 	rm -rf "$dest"
 }
 
-# backups bash_rc_file
+# backups a file
 backup() {
 	local source="$1"
 	local backup="$2"
@@ -53,7 +53,7 @@ backup() {
 	cp "$source" "$backup"
 }
 
-# restores bash_rc_file
+# restores a file
 restore() {
 	local backup="$1"
 	local dest="$2"
