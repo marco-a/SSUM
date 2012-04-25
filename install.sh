@@ -198,22 +198,34 @@ fi
 
 info "Secured Single User Mode (SSUM) Setup"
 
-### under construction
-prompt "Please enter a password" 1
+### ask for password
 
-password="$data"
-
-if ( is_empty "$password" ) then
-	error "Password is empty"
-fi
-
-prompt "Please repeat the password" 1
-
-password_repeat="$data"
-
-if [ "$password" != "$password_repeat" ]; then
-	error "Passwords are not equal"
-fi
+password=""
+password_repeat=""
+while true; do
+	
+	if ( is_empty "$password" ) then
+		prompt "Please enter a password" 1
+		
+		password="$data"
+		
+		if ( is_empty "$password" ) then
+			error "Password is empty" 0
+		fi
+	elif ( is_empty "$password_repeat" ) then
+		prompt "Please repeat the password" 1
+		
+		password_repeat="$data"
+	elif [ "$password" != "$password_repeat" ]; then
+		password=""
+		password_repeat=""
+		
+		error "Passwords are not equal" 0
+	else
+		break
+	fi
+	
+done
 
 prompt "Please enter the amount of tries"
 
