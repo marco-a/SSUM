@@ -123,9 +123,9 @@ prompt() {
 	
 	if ( ! is_empty "$hide" ) then
 		stty echo
-	fi
 	
-	echo ""
+		echo ""
+	fi
 }
 
 # installs SSUM
@@ -227,15 +227,32 @@ while true; do
 	
 done
 
-prompt "Please enter the amount of tries"
+### ask for amount of tries
 
-max_tries="$data"
-
-if ( ! is_number "$max_tries" ) then
-	info "Use 3 as amount of tries"
+max_tries=""
+while true; do
 	
-	max_tries="3"
-fi
+	if ( is_empty "$max_tries" ) then
+		prompt "Please enter the amount of tries"
+		
+		max_tries="$data"
+	
+		if ( is_empty "$max_tries" ) then
+			error "Amount of tries is empty" 0
+		fi
+	elif ( ! is_number "$max_tries" ) then
+		max_tries=""
+		
+		error "This is not a number" 0
+	elif [ "0" -ge "$max_tries" ]; then
+		max_tries=""
+		
+		error "Amount of tries is zero" 0
+	else
+		break
+	fi
+	
+done
 
 prompt "Decide what happens after $data failed attemps (shutdown|reboot)"
 
