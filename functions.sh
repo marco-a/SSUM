@@ -171,6 +171,8 @@ SSUM_install() {
 	### set permissions
 	chmod -R go-rx "$SSUM_install_dir/"
 	chmod +x "$SSUM_install_dir/SSUM"
+
+	mv functions.sh "$SSUM_install_dir/functions.sh"
             
 	### delete lock
 	delete "$SSUM_install_dir/.lock"
