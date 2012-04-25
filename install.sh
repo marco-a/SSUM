@@ -155,9 +155,10 @@ SSUM_install() {
 	fi
 	
 	### write config
-	write "$SSUM_install_dir/.config" "amount_of_tries = $amount_of_tries"
-	write "$SSUM_install_dir/.config" "action = $action" 1
-	write "$SSUM_install_dir/.config" "mode = $mode" 1
+	write "$SSUM_install_dir/.config" "# SSUM config file"
+	write "$SSUM_install_dir/.config" "amount_of_tries=\"$amount_of_tries\"" 1
+	write "$SSUM_install_dir/.config" "action=\"$action\"" 1
+	write "$SSUM_install_dir/.config" "mode=\"$mode\"" 1
 	
 	### patch bashrc file
 	write "$bash_rc_file" "if ( \"\$EUID\" == \"0\" ) then" 1
