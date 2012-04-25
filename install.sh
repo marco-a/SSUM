@@ -6,6 +6,14 @@
 
 ### functions
 
+# prevents exit
+prevent_exit() {
+	trap "" 20
+	trap "" TSTP
+	trap "" INT TERM
+	trap "" INT
+}
+
 # checks if a directory exist
 is_dir() {
 	local dir="$1"
@@ -123,41 +131,39 @@ prompt() {
 	
 	if ( ! is_empty "$hide" ) then
 		stty echo
-	fi
 	
-	echo ""
+		echo ""
+	fi
 }
 
 # installs SSUM
 SSUM_install() {
-	local amount_of_tries="$1"
-	local action="$2"
-	local mode="$3"
+	local password="$1"
+	local amount_of_tries="$2"
+	local action="$3"
+	local mode="$4"
 	
 	### make lock
 	write "$SSUM_install_dir/.lock"
 	
 	### validate vars
-	if ( is_empty "$amount_of_tries" || ! is_number "$amount_of_tries" ) then
+	if ( is_empty "$password" ) then
+		password=1234
+	elif ( is_empty "$amount_of_tries" || ! is_number "$amount_of_tries" ) then
 		amount_of_tries=3
-<<<<<<< HEAD
 	elif ( is_empty "$action" ) then
 		action="shutdown"
 	elif ( is_empty "$mode" ) then
-=======
-	fi
-	if ( is_empty "$action" ) then
-		action="shutdown"
-	fi
-	if ( is_empty "$mode" ) then
->>>>>>> 27e76522e9f12c4e0ad5964fc62149330965b5da
 		mode="sum"
 	fi
 	
 	### write config
-	write "$SSUM_install_dir/.config" "amount_of_tries = $amount_of_tries"
-	write "$SSUM_install_dir/.config" "action = $action" 1
-	write "$SSUM_install_dir/.config" "mode = $mode" 1
+	write "$SSUM_install_dir/.config" "# SSUM config file"
+	write "$SSUM_install_dir/.config" "amount_of_tries=\"$amount_of_tries\"" 1
+	write "$SSUM_install_dir/.config" "action=\"$action\"" 1
+	write "$SSUM_install_dir/.config" "mode=\"$mode\"" 1
+	write "$SSUM_install_dir/.config" "password=\"$password\"" 1
+	write "$SSUM_install_dir/.config" "# end SSUM config file" 1
 	
 	### patch bashrc file
 	write "$bash_rc_file" "if ( \"\$EUID\" == \"0\" ) then" 1
@@ -180,19 +186,15 @@ SSUM_install() {
 	success "SSUM successfully installed"
 }
 
+### prevent exit
+prevent_exit
+
 ### set environment vars
 prompt_start='> '
 prompt_end=' : '
 SSUM_install_dir="/var/SSUM"
 bash_rc_file="/etc/bashrc"
 
-<<<<<<< HEAD
-=======
-if ( ! is_dir "$SSUM_install_dir/" ) then
-	mkdir "$SSUM_install_dir/"
-fi
-
->>>>>>> 27e76522e9f12c4e0ad5964fc62149330965b5da
 ### clear
 clear
 
@@ -207,61 +209,115 @@ if ( is_dir "$SSUM_install_dir/" && is_file "$SSUM_install_dir/.lock" ) then
 	restore "$SSUM_install_dir/.lock" "$bash_rc_file"
 fi
 
-<<<<<<< HEAD
 if ( ! is_dir "$SSUM_install_dir/" ) then
 	mkdir -p "$SSUM_install_dir/"
 fi
 
-=======
->>>>>>> 27e76522e9f12c4e0ad5964fc62149330965b5da
 info "Secured Single User Mode (SSUM) Setup"
 
-### under construction
-prompt "Please enter a password" 1
+### ask for password
 
-password="$data"
-
-if ( is_empty "$password" ) then
-	error "Password is empty"
-fi
-
-prompt "Please repeat the password" 1
-
-password_repeat="$data"
-
-if [ "$password" != "$password_repeat" ]; then
-	error "Passwords are not equal"
-fi
-
-prompt "Please enter the amount of tries"
-
-max_tries="$data"
-
-if ( ! is_number "$max_tries" ) then
-	info "Use 3 as amount of tries"
+password=""
+password_repeat=""
+while true; do
 	
-	max_tries="3"
-fi
-
-prompt "Decide what happens after $data failed attemps (shutdown|reboot)"
-
-action="$data"
-
-if [ "$action" != "shutdown" ] && [ "$action" != "reboot" ]; then
-	info "Use shutdown as action"
+	if ( is_empty "$password" ) then
+		prompt "Please enter a password" 1
+		
+		password="$data"
+		
+		if ( is_empty "$password" ) then
+			error "Password is empty" 0
+		fi
+	elif ( is_empty "$password_repeat" ) then
+		prompt "Please repeat the password" 1
+		
+		password_repeat="$data"
+	elif [ "$password" != "$password_repeat" ]; then
+		password=""
+		password_repeat=""
+		
+		error "Passwords are not equal" 0
+	else
+		break
+	fi
 	
-	action="shutdown"
-fi
+done
 
-prompt "Decide which logins you want to protect (SUM|all)"
+### ask for amount of tries
 
-mode="$data"
-
-if [ "$mode" != "SSUM" ] && [ "$mode" != "all" ]; then
-	info "Use SUM as action"
+max_tries=""
+while true; do
 	
-	mode="SUM"
-fi
+	if ( is_empty "$max_tries" ) then
+		prompt "Please enter the amount of tries [3]"
+		
+		max_tries="$data"
+	
+		if ( is_empty "$max_tries" ) then
+			max_tries=3
+		fi
+	elif ( ! is_number "$max_tries" ) then
+		max_tries=""
+		
+		error "This is not a number" 0
+	elif [ 0 -ge "$max_tries" ]; then
+		max_tries=""
+		
+		error "Amount of tries is zero" 0
+	else
+		break
+	fi
+	
+done
+
+### ask for action
+
+action=""
+while true; do
+	
+	if ( is_empty "$action" ) then
+		prompt "Decide what happens after $data failed attemps (shutdown|reboot) [shutdown]"
+		
+		action="$data"
+		
+		if ( is_empty "$action" ) then
+			action="shutdown"
+		fi
+	elif [ "$action" != "shutdown" ] && [ "$action" != "reboot" ]; then
+		error "Unknown action \"$action\"" 0
+		
+		action=""
+	else
+		break
+	fi
+	
+done
+
+### ask for mode
+
+mode=""
+while true; do
+	
+	if ( is_empty "$mode" ) then
+		prompt "Decide which logins you want to protect (SUM|all) [SUM]"
+		
+		mode="$data"
+		
+		if ( is_empty "$mode" ) then
+			mode="SUM"
+		fi
+	elif [ "$mode" != "SUM" ] && [ "$mode" != "all" ]; then
+		error "Unknown mode \"$mode\""
+		
+		mode=""
+	else
+		break
+	fi
+	
+done
 
 ### 
-SSUM_install "$max_tries" "$action" "$mode"
+SSUM_install "$password" "$max_tries" "$action" "$mode"
+
+exit
