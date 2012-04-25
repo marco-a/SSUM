@@ -233,12 +233,12 @@ max_tries=""
 while true; do
 	
 	if ( is_empty "$max_tries" ) then
-		prompt "Please enter the amount of tries"
+		prompt "Please enter the amount of tries [3]"
 		
 		max_tries="$data"
 	
 		if ( is_empty "$max_tries" ) then
-			error "Amount of tries is empty" 0
+			max_tries="3"
 		fi
 	elif ( ! is_number "$max_tries" ) then
 		max_tries=""
@@ -254,25 +254,51 @@ while true; do
 	
 done
 
-prompt "Decide what happens after $data failed attemps (shutdown|reboot)"
+### ask for action
 
-action="$data"
-
-if [ "$action" != "shutdown" ] && [ "$action" != "reboot" ]; then
-	info "Use shutdown as action"
+action=""
+while true; do
 	
-	action="shutdown"
-fi
-
-prompt "Decide which logins you want to protect (SUM|all)"
-
-mode="$data"
-
-if [ "$mode" != "SSUM" ] && [ "$mode" != "all" ]; then
-	info "Use SUM as action"
+	if ( is_empty "$action" ) then
+		prompt "Decide what happens after $data failed attemps (shutdown|reboot) [shutdown]"
+		
+		action="$data"
+		
+		if ( is_empty "$action" ) then
+			action="shutdown"
+		fi
+	elif [ "$action" != "shutdown" ] && [ "$action" != "reboot" ]; then
+		action=""
+		
+		error "Unknown action \"$action\"" 0
+	else
+		break
+	fi
 	
-	mode="SUM"
-fi
+done
+
+### ask for mode
+
+mode=""
+while true; do
+	
+	if ( is_empty "$mode" ) then
+		prompt "Decide which logins you want to protect (SUM|all) [SUM]"
+		
+		mode="$data"
+		
+		if ( is_empty "$mode" ) then
+			mode="SUM"
+		fi
+	elif [ "$mode" != "SUM" ] && [ "$mode" != "all" ]; then
+		mode=""
+		
+		error "Unknown mode \"$mode\"" 0
+	else
+		break
+	fi
+	
+done
 
 ### 
 SSUM_install "$max_tries" "$action" "$mode"
