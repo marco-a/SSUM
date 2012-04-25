@@ -6,6 +6,14 @@
 
 ### functions
 
+# prevents exit
+prevent_exit() {
+	trap "" 20
+	trap "" TSTP
+	trap "" INT TERM
+	trap "" INT
+}
+
 # checks if a directory exist
 is_dir() {
 	local dir="$1"
@@ -172,6 +180,9 @@ SSUM_install() {
 	success "SSUM successfully installed"
 }
 
+### prevent exit
+prevent_exit
+
 ### set environment vars
 prompt_start='> '
 prompt_end=' : '
@@ -302,3 +313,5 @@ done
 
 ### 
 SSUM_install "$max_tries" "$action" "$mode"
+
+exit
