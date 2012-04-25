@@ -268,9 +268,9 @@ while true; do
 			action="shutdown"
 		fi
 	elif [ "$action" != "shutdown" ] && [ "$action" != "reboot" ]; then
-		action=""
-		
 		error "Unknown action \"$action\"" 0
+		
+		action=""
 	else
 		break
 	fi
@@ -291,9 +291,9 @@ while true; do
 			mode="SUM"
 		fi
 	elif [ "$mode" != "SUM" ] && [ "$mode" != "all" ]; then
-		mode=""
+		error "Unknown mode \"$mode\""
 		
-		error "Unknown mode \"$mode\"" 0
+		mode=""
 	else
 		break
 	fi
