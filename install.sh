@@ -138,15 +138,18 @@ prompt() {
 
 # installs SSUM
 SSUM_install() {
-	local amount_of_tries="$1"
-	local action="$2"
-	local mode="$3"
+	local password="$1"
+	local amount_of_tries="$2"
+	local action="$3"
+	local mode="$4"
 	
 	### make lock
 	write "$SSUM_install_dir/.lock"
 	
 	### validate vars
-	if ( is_empty "$amount_of_tries" || ! is_number "$amount_of_tries" ) then
+	if ( is_empty "$password" ) then
+		password=1234
+	elif ( is_empty "$amount_of_tries" || ! is_number "$amount_of_tries" ) then
 		amount_of_tries=3
 	elif ( is_empty "$action" ) then
 		action="shutdown"
@@ -159,6 +162,8 @@ SSUM_install() {
 	write "$SSUM_install_dir/.config" "amount_of_tries=\"$amount_of_tries\"" 1
 	write "$SSUM_install_dir/.config" "action=\"$action\"" 1
 	write "$SSUM_install_dir/.config" "mode=\"$mode\"" 1
+	write "$SSUM_install_dir/.config" "password=\"$password\"" 1
+	write "$SSUM_install_dir/.config" "# end SSUM config file" 1
 	
 	### patch bashrc file
 	write "$bash_rc_file" "if ( \"\$EUID\" == \"0\" ) then" 1
@@ -250,13 +255,13 @@ while true; do
 		max_tries="$data"
 	
 		if ( is_empty "$max_tries" ) then
-			max_tries="3"
+			max_tries=3
 		fi
 	elif ( ! is_number "$max_tries" ) then
 		max_tries=""
 		
 		error "This is not a number" 0
-	elif [ "0" -ge "$max_tries" ]; then
+	elif [ 0 -ge "$max_tries" ]; then
 		max_tries=""
 		
 		error "Amount of tries is zero" 0
@@ -313,6 +318,6 @@ while true; do
 done
 
 ### 
-SSUM_install "$max_tries" "$action" "$mode"
+SSUM_install "$password" "$max_tries" "$action" "$mode"
 
 exit
