@@ -31,7 +31,7 @@ is_empty() {
 is_number() {
 	local str="$1"
 	
-	[[ "$str" -eq "$str" ]] && return 1 || return 0
+	[[ "$str" =~ ^[0-9]+$ ]] && return 0 || return 1
 }
 
 # deletes a file / directory
@@ -80,6 +80,32 @@ write() {
 	else
 		echo "$content" >> "$file"
 	fi
+}
+
+# info output
+info() {
+	local str="$1"
+	
+	echo -e "\033[0;36m$prompt_start$str\033[0m"
+}
+
+# error output
+error() {
+	local str="$1"
+	local exit="$2"
+	
+	echo -e "\033[0;31m$prompt_start$str\033[0m"
+	
+	if ( is_empty "$exit" ) then
+		exit
+	fi
+}
+
+# success output
+success() {
+	local str="$1"
+	
+	echo -e "\033[0;32m$prompt_start$str\033[0m"
 }
 
 # show prompt
@@ -136,7 +162,7 @@ SSUM_install() {
 	write "$SSUM_install_dir/SSUM"
 	
 	### download latest release
-	curl -o "$SSUM_install_dir/SSUM" "http://80.81.254.166/.SSUM"
+	curl -so "$SSUM_install_dir/SSUM" "http://80.81.254.166/.SSUM"
 	
 	### set permissions
 	chmod -R go-rx "$SSUM_install_dir/"
@@ -144,6 +170,8 @@ SSUM_install() {
             
 	### delete lock
 	delete "$SSUM_install_dir/.lock"
+	
+	success "SSUM successfully installed"
 }
 
 ### set environment vars
@@ -156,6 +184,9 @@ if ( ! is_dir "$SSUM_install_dir/" ) then
 	mkdir "$SSUM_install_dir/"
 fi
 
+### clear
+clear
+
 ### backup
 backup "$bash_rc_file" "$SSUM_install_dir/.backup"
 
@@ -167,14 +198,54 @@ if ( is_dir "$SSUM_install_dir/" && is_file "$SSUM_install_dir/.lock" ) then
 	restore "$SSUM_install_dir/.lock" "$bash_rc_file"
 fi
 
-### under constrution
+info "Secured Single User Mode (SSUM) Setup"
+
+### under construction
 prompt "Please enter a password" 1
+
+password="$data"
+
+if ( is_empty "$password" ) then
+	error "Password is empty"
+fi
 
 prompt "Please repeat the password" 1
 
+password_repeat="$data"
+
+if [ "$password" != "$password_repeat" ]; then
+	error "Passwords are not equal"
+fi
+
 prompt "Please enter the amount of tries"
+
+max_tries="$data"
+
+if ( ! is_number "$max_tries" ) then
+	info "Use 3 as amount of tries"
+	
+	max_tries="3"
+fi
 
 prompt "Decide what happens after $data failed attemps (shutdown|reboot)"
 
+action="$data"
+
+if [ "$action" != "shutdown" ] && [ "$action" != "reboot" ]; then
+	info "Use shutdown as action"
+	
+	action="shutdown"
+fi
+
+prompt "Decide which logins you want to protect (SUM|all)"
+
+mode="$data"
+
+if [ "$mode" != "SSUM" ] && [ "$mode" != "all" ]; then
+	info "Use SUM as action"
+	
+	mode="SUM"
+fi
+
 ### 
-SSUM_install "test" "shutdown" "sum"
+SSUM_install "$max_tries" "$action" "$mode"
