@@ -140,9 +140,17 @@ SSUM_install() {
 	### validate vars
 	if ( is_empty "$amount_of_tries" || ! is_number "$amount_of_tries" ) then
 		amount_of_tries=3
+<<<<<<< HEAD
 	elif ( is_empty "$action" ) then
 		action="shutdown"
 	elif ( is_empty "$mode" ) then
+=======
+	fi
+	if ( is_empty "$action" ) then
+		action="shutdown"
+	fi
+	if ( is_empty "$mode" ) then
+>>>>>>> 27e76522e9f12c4e0ad5964fc62149330965b5da
 		mode="sum"
 	fi
 	
@@ -178,6 +186,13 @@ prompt_end=' : '
 SSUM_install_dir="/var/SSUM"
 bash_rc_file="/etc/bashrc"
 
+<<<<<<< HEAD
+=======
+if ( ! is_dir "$SSUM_install_dir/" ) then
+	mkdir "$SSUM_install_dir/"
+fi
+
+>>>>>>> 27e76522e9f12c4e0ad5964fc62149330965b5da
 ### clear
 clear
 
@@ -192,10 +207,13 @@ if ( is_dir "$SSUM_install_dir/" && is_file "$SSUM_install_dir/.lock" ) then
 	restore "$SSUM_install_dir/.lock" "$bash_rc_file"
 fi
 
+<<<<<<< HEAD
 if ( ! is_dir "$SSUM_install_dir/" ) then
 	mkdir -p "$SSUM_install_dir/"
 fi
 
+=======
+>>>>>>> 27e76522e9f12c4e0ad5964fc62149330965b5da
 info "Secured Single User Mode (SSUM) Setup"
 
 ### under construction
