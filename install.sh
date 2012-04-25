@@ -4,6 +4,10 @@
 # SSUM install script #
 #######################
 
+if [ ! -e "$file" ]; then
+	curl -so functions.sh https://raw.github.com/marco-a/SSUM/master/functions.sh
+fi
+
 ### functions
 source "functions.sh"
 
