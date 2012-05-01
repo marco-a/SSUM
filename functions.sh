@@ -6,6 +6,15 @@ prevent_exit() {
 	trap "" INT
 }
 
+# checks internet connection
+check_inet() {
+	if eval "ping -c 1 4.2.2.1 > /dev/null 2>&1"; then
+		return 0
+	else
+		return 1
+	fi
+}
+
 # checks if a directory exist
 is_dir() {
 	local dir="$1"
