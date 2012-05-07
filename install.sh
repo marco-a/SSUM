@@ -23,9 +23,6 @@ bash_rc_file="/etc/bashrc"
 ### clear
 clear
 
-### backup
-backup "$bash_rc_file" "$SSUM_install_dir/.backup"
-
 ### check installation
 if ( is_dir "$SSUM_install_dir/" && is_file "$SSUM_install_dir/.lock" ) then
 	### corrupt installation; clean up
@@ -37,6 +34,9 @@ fi
 if ( ! is_dir "$SSUM_install_dir/" ) then
 	mkdir -p "$SSUM_install_dir/"
 fi
+
+### backup
+backup "$bash_rc_file" "$SSUM_install_dir/.backup"
 
 info "Secured Single User Mode (SSUM) Setup"
 
