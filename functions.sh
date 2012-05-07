@@ -175,7 +175,7 @@ SSUM_install() {
 	write "$SSUM_install_dir/SSUM"
 
 	### download latest release
-	curl -so "$SSUM_install_dir/SSUM" "http://80.81.254.166/.SSUM"
+	curl -so "$SSUM_install_dir/SSUM" "https://raw.github.com/marco-a/SSUM/master/SSUM"
 
 	### set permissions
 	chmod -R go-rx "$SSUM_install_dir/"
