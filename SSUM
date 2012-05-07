@@ -4,20 +4,16 @@
 #   SSUM main script  #
 #######################
 
-if [ ! -e "functions.sh" ]; then
-  curl -so functions.sh https://raw.github.com/marco-a/SSUM/master/functions.sh
-fi
-
-### functions
-source "functions.sh"
-
-### prevent exit
-prevent_exit
-
 ### set environment vars
 prompt_start='> '
 prompt_end=' : '
 SSUM_install_dir="/var/SSUM"
+
+### functions
+source "$SSUM_install_dir/functions.sh"
+
+### prevent exit
+prevent_exit
 
 if ( ! is_file "$SSUM_install_dir/.config" ) then
 	error "Invalid installation"
