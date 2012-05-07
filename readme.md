@@ -3,5 +3,5 @@
 ## Install SSUM
 
 ```bash
-$ curl -s https://raw.github.com/marco-a/SSUM/master/install.sh | sh
+$ curl -so install.sh https://raw.github.com/marco-a/SSUM/master/install.sh && chmod +x install.sh && ./install.sh
 ```
