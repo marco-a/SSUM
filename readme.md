@@ -5,7 +5,7 @@ this is useful when you want to avoid unauthorized access on your mac.
 > information: this script does not prevent a boot from a disk, it only secures single user mode with a user defined password!
 
 # secure also shell logins
-if `mode` is set to `all` SSUM will prompt your password everytime a login as root is done.
+if `mode` is set to `all` SSUM will prompt your previously defined password as soon as a login as root succeeded.
 
 ## requirements
 you'll need root access, mac osx 10.6+ and the curl extension installed. 
