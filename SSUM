@@ -19,7 +19,7 @@ prompt_start='> '
 prompt_end=' : '
 SSUM_install_dir="/var/SSUM"
 
-if ( ! is_file ".config" ) then
+if ( ! is_file "$SSUM_install_dir/.config" ) then
 	error "Invalid installation"
 fi
 
@@ -27,7 +27,7 @@ fi
 /sbin/mount -uw / >/dev/null 2>&1
 
 ### read config
-source ".config"
+source "$SSUM_install_dir/.config"
 
 ### clear
 clear
