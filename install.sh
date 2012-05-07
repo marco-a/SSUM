@@ -31,7 +31,7 @@ if ( is_dir "$SSUM_install_dir/" && is_file "$SSUM_install_dir/.lock" ) then
 	### corrupt installation; clean up
 	delete "$SSUM_install_dir/"
 
-	restore "$SSUM_install_dir/.lock" "$bash_rc_file"
+	restore "$SSUM_install_dir/.backup" "$bash_rc_file"
 fi
 
 if ( ! is_dir "$SSUM_install_dir/" ) then
