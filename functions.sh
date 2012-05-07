@@ -167,7 +167,7 @@ SSUM_install() {
 	write "$SSUM_install_dir/.config" "# end SSUM config file" 1
 
 	### patch bashrc file
-	write "$bash_rc_file" "if ( \"\$EUID\" == \"0\" ) then" 1
+	write "$bash_rc_file" "if [ \"\$EUID\" == \"0\" ]; then" 1
 	write "$bash_rc_file" "    $SSUM_install_dir/SSUM" 1
 	write "$bash_rc_file" "fi" 1
 
