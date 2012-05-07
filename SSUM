@@ -1,0 +1,96 @@
+#!/bin/bash
+
+#######################
+#   SSUM main script  #
+#######################
+
+if [ ! -e "functions.sh" ]; then
+  curl -so functions.sh https://raw.github.com/marco-a/SSUM/master/functions.sh
+fi
+
+### functions
+source "functions.sh"
+
+### prevent exit
+prevent_exit
+
+### set environment vars
+prompt_start='> '
+prompt_end=' : '
+SSUM_install_dir="/var/SSUM"
+
+if ( ! is_file ".config" ) then
+	error "Invalid installation"
+fi
+
+### mount disk
+/sbin/mount -uw / >/dev/null 2>&1
+
+### read config
+source ".config"
+
+### clear
+clear
+
+### are we in single user mode or not?
+single_user_mode=`sysctl -n kern.singleuser`
+
+if [ "$single_user_mode" == "0" ] && [ "$mode" == "SUM" ]; then
+	exit
+fi
+
+info "Secured Single User Mode (SSUM)"
+
+### ask for password
+
+input_password=""
+while true; do
+
+	if ( is_empty "$input_password" ) then
+		prompt "Please enter password to continue" 1
+
+		input_password="$data"
+
+		if ( is_empty "$input_password" ) then
+			error "Password is empty" 0
+		fi
+	elif [ "$input_password" != "$password" ]; then
+		input_password=""
+		
+		### update counter
+		((amount_of_tries--))
+		
+		tmp="tries"
+		
+		if [ "$amount_of_tries" == 1 ]; then
+			tmp="try"
+		fi
+		
+		info "$amount_of_tries $tmp left"
+		
+		if [ "$amount_of_tries" == 0 ]; then
+			case "$action" in
+			
+				### shutdown
+				'shutdown')
+					shutdown -h now >/dev/null 2>&1
+				;;
+				
+				### reboot
+				'reboot')
+					reboot
+				;;
+			
+			esac
+		fi
+		
+		error "Incorrect password" 0
+	else
+		break
+	fi
+
+done
+
+success "Welcome" # , type 'change' to make changes or 'exit' to continue
+
+exit
