@@ -31,7 +31,7 @@ clear
 ### are we in single user mode or not?
 single_user_mode=`sysctl -n kern.singleuser`
 
-if [ "$single_user_mode" == "1" ] && [ "$mode" == "SUM" ]; then
+if [ "$single_user_mode" == "0" ] && [ "$mode" == "SUM" ]; then
 	exit
 fi
 
