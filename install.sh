@@ -133,7 +133,7 @@ while true; do
 			mode="SUM"
 		fi
 	elif [ "$mode" != "SUM" ] && [ "$mode" != "all" ]; then
-		error "Unknown mode \"$mode\""
+		error "Unknown mode \"$mode\"" 0
 
 		mode=""
 	else
